@@ -54,6 +54,20 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+	// バリデーション(空文字対策)
+	if req.Email == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "email is required",
+		})
+		return
+	}
+
+	if req.Password == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "password is required",
+		})
+		return
+	}
 
 	user := model.User{
 		ID:           1,

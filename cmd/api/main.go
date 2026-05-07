@@ -1,6 +1,7 @@
 package main
 
 import (
+	"auth-api/model"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -54,10 +55,23 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]string{
-		"message": "signup request received",
-		"email":   req.Email,
-	})
+	user := model.User{
+		ID:           1,
+		Email:        req.Email,
+		PasswordHash: "hashed_password",
+		CreatedAt:    "2025-10-15T12:00:00Z",
+		UpdatedAt:    "2025-10-15T12:00:00Z",
+	}
+
+	res := model.UserResponse{
+		ID:        user.ID,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	// レスポンスを返す
+	writeJSON(w, http.StatusOK, res)
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) {

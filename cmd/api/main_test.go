@@ -20,17 +20,17 @@ func TestSignupHandlerAcceptsJSON(t *testing.T) {
 		t.Fatalf("expected status %d, got %d", http.StatusOK, rec.Code)
 	}
 
-	var body map[string]string
+	var body map[string]any
 	if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
 		t.Fatalf("failed to decode response body: %v", err)
 	}
 
-	if body["message"] != "signup request received" {
-		t.Fatalf("expected signup message, got %q", body["message"])
-	}
-
 	if body["email"] != "user@example.com" {
 		t.Fatalf("expected email in response, got %q", body["email"])
+	}
+
+	if _, ok := body["password_hash"]; ok {
+		t.Fatal("response should not include password_hash")
 	}
 
 	if _, ok := body["password"]; ok {

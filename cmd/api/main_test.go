@@ -63,3 +63,55 @@ func TestSignupHandlerReturnsJSONErrorForInvalidJSON(t *testing.T) {
 		t.Fatalf("expected invalid JSON error, got %q", body["error"])
 	}
 }
+
+func TestSignupHandlerReturnsJSONErrorForEmptyEmail(t *testing.T) {
+	mux := newServerMux()
+
+	req := httptest.NewRequest(http.MethodPost, "/signup", strings.NewReader(`{"email":"","password":"secret"}`))
+	rec := httptest.NewRecorder()
+
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	if contentType := rec.Header().Get("Content-Type"); contentType != "application/json" {
+		t.Fatalf("expected Content-Type application/json, got %q", contentType)
+	}
+
+	var body map[string]string
+	if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
+		t.Fatalf("failed to decode response body: %v", err)
+	}
+
+	if body["error"] != "email is required" {
+		t.Fatalf("expected email required error, got %q", body["error"])
+	}
+}
+
+func TestSignupHandlerReturnsJSONErrorForEmptyPassword(t *testing.T) {
+	mux := newServerMux()
+
+	req := httptest.NewRequest(http.MethodPost, "/signup", strings.NewReader(`{"email":"user@example.com","password":""}`))
+	rec := httptest.NewRecorder()
+
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	if contentType := rec.Header().Get("Content-Type"); contentType != "application/json" {
+		t.Fatalf("expected Content-Type application/json, got %q", contentType)
+	}
+
+	var body map[string]string
+	if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
+		t.Fatalf("failed to decode response body: %v", err)
+	}
+
+	if body["error"] != "password is required" {
+		t.Fatalf("expected password required error, got %q", body["error"])
+	}
+}
